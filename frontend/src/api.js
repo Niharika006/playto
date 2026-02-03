@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// API base URL - use environment variable for production
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// API base URL - use environment variable for production, fallback to production URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://playto-backend-3hfh.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -9,8 +9,14 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Build for production
+RUN npm run build
+
+# Install serve globally
+RUN npm install -g serve
+
 # Expose port
 EXPOSE 3000
 
-# Run development server
-CMD ["npm", "run", "dev"]
+# Serve the production build
+CMD serve -s dist -l ${PORT:-3000}

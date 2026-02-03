@@ -1,7 +1,19 @@
 import axios from 'axios';
 
-// API base URL - use environment variable for production, fallback to production URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://playto-backend-3hfh.onrender.com/api';
+// API base URL - use environment variable, or detect based on current host
+const getApiUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  // If running locally, use local backend
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:8000/api';
+  }
+  // Production fallback
+  return 'https://playto-backend-3hfh.onrender.com/api';
+};
+
+const API_BASE_URL = getApiUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,

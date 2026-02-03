@@ -1,0 +1,36 @@
+# Production Overrides for Docker Compose
+#
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Changes from development:
+# - No volume mounts (use built images)
+# - Gunicorn instead of Django dev server
+# - Production environment variables
+# - No debug mode
+
+services:
+  db:
+    restart: always
+    environment:
+      # In production, use secrets management (e.g., Docker secrets, Vault)
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+
+  backend:
+    restart: always
+    volumes: []  # No volume mounts in production
+    environment:
+      DEBUG: "False"
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost}
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4"
+
+  frontend:
+    restart: always
+    volumes: []  # No volume mounts in production
+    environment:
+      NODE_ENV: production
+    command: sh -c "npm run build && npm run preview -- --host 0.0.0.0 --port 3000"
